@@ -1,10 +1,21 @@
 package utils;
 
+// Importamos la clase Scanner para poder leer datos de la consola
 import java.util.Scanner;
 
+/**
+ * Clase que representa la utilidad de la consola
+ */
 public class ConsolaUtils {
+    // Creamos un objeto Scanner para poder leer datos de la consola
     private static final Scanner sc = new Scanner(System.in);
 
+    /**
+     * Método que lee un texto de la consola
+     * 
+     * @param mensaje Mensaje a mostrar en la consola
+     * @return Texto leído de la consola
+     */
     public static String leerTexto(String mensaje) {
         String texto = "";
         while (texto.isEmpty()) {
@@ -17,6 +28,12 @@ public class ConsolaUtils {
         return texto;
     }
 
+    /**
+     * Método que lee un entero de la consola
+     * 
+     * @param mensaje Mensaje a mostrar en la consola
+     * @return Entero leído de la consola
+     */
     public static int leerEntero(String mensaje) {
         System.out.print(mensaje);
         try {

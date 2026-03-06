@@ -1,22 +1,37 @@
 package app;
 
+// Importamos las clases que vamos a usar
 import model.Nota;
 import model.Usuario;
 import service.NotaService;
 import service.UsuarioService;
 import utils.ConsolaUtils;
+
+// Importamos la clase java.util.List para poder usarla
 import java.util.List;
 
+/**
+ * Clase principal que contiene el método main y los métodos para ejecutar el
+ * programa
+ */
 public class Main {
     // Instanciamos nuestros servicios
     private static final UsuarioService us = new UsuarioService();
     private static final NotaService ns = new NotaService(us);
 
+    /**
+     * Método principal que se ejecuta al iniciar el programa
+     * 
+     * @param args Argumentos de la línea de comandos
+     */
     public static void main(String[] args) {
         us.inicializarSistema();
         menuPrincipal();
     }
 
+    /**
+     * Método que muestra el menú principal y permite al usuario elegir una opción
+     */
     private static void menuPrincipal() {
         int opcion;
         do {
@@ -44,6 +59,9 @@ public class Main {
         } while (opcion != 0);
     }
 
+    /**
+     * Método que permite al usuario registrarse
+     */
     private static void registrar() {
         System.out.println("\n--- REGISTRO ---");
         String email = ConsolaUtils.leerTexto("Email: ");
@@ -57,6 +75,9 @@ public class Main {
         }
     }
 
+    /**
+     * Método que permite al usuario iniciar sesión
+     */
     private static void login() {
         System.out.println("\n--- LOGIN ---");
         String email = ConsolaUtils.leerTexto("Email: ");
@@ -70,6 +91,11 @@ public class Main {
         }
     }
 
+    /**
+     * Método que muestra el menú del usuario y permite al usuario elegir una opción
+     * 
+     * @param emailLogueado Email del usuario logueado
+     */
     private static void menuUsuario(String emailLogueado) {
         int opcion;
         do {
@@ -105,6 +131,11 @@ public class Main {
         } while (opcion != 0);
     }
 
+    /**
+     * Método que permite al usuario crear una nota
+     * 
+     * @param email Email del usuario logueado
+     */
     private static void crearNotaMenu(String email) {
         System.out.println("\n--- NUEVA NOTA ---");
         String titulo = ConsolaUtils.leerTexto("Título: ");
@@ -114,6 +145,11 @@ public class Main {
         ns.guardarNota(email, nueva);
     }
 
+    /**
+     * Método que permite al usuario listar sus notas
+     * 
+     * @param email Email del usuario logueado
+     */
     private static void listarNotasMenu(String email) {
         List<Nota> misNotas = ns.obtenerNotas(email);
         if (misNotas.isEmpty()) {
@@ -127,6 +163,11 @@ public class Main {
         }
     }
 
+    /**
+     * Método que permite al usuario ver una nota
+     * 
+     * @param email Email del usuario logueado
+     */
     private static void verNotaMenu(String email) {
         List<Nota> misNotas = ns.obtenerNotas(email);
         if (misNotas.isEmpty()) {
@@ -146,6 +187,11 @@ public class Main {
         }
     }
 
+    /**
+     * Método que permite al usuario eliminar una nota
+     * 
+     * @param email Email del usuario logueado
+     */
     private static void eliminarNotaMenu(String email) {
         int numero = ConsolaUtils.leerEntero("Número de la nota a eliminar: ");
         if (ns.eliminarNota(email, numero)) {

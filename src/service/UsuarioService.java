@@ -1,18 +1,31 @@
 package service;
 
+// Importamos las clases que vamos a usar
 import model.Usuario;
+
+// Importamos las clases de java.io para poder trabajar con ficheros
 import java.io.BufferedWriter;
 import java.io.IOException;
+
+// Importamos las clases de java.nio.file para poder trabajar con ficheros
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+
+// Importamos las clases de java.util para poder trabajar con listas
 import java.util.List;
 
+/**
+ * Clase que representa el servicio de usuarios
+ */
 public class UsuarioService {
     private static final Path CARPETA_DATA = Path.of("data");
     private static final Path FICHERO_USUARIOS = CARPETA_DATA.resolve("users.txt");
     public static final Path CARPETA_USUARIOS = CARPETA_DATA.resolve("usuarios");
 
+    /**
+     * Método que inicializa el sistema
+     */
     public void inicializarSistema() {
         try {
             Files.createDirectories(CARPETA_USUARIOS);
@@ -24,10 +37,22 @@ public class UsuarioService {
         }
     }
 
+    /**
+     * Método que sanitiza el email
+     * 
+     * @param email Email a sanitizar
+     * @return Email sanitizado
+     */
     public String sanitizarEmail(String email) {
         return email.replace("@", "_").replace(".", "_");
     }
 
+    /**
+     * Método que comprueba si existe un usuario
+     * 
+     * @param email Email del usuario
+     * @return true si el usuario existe, false en caso contrario
+     */
     public boolean existeUsuario(String email) {
         try {
             List<String> lineas = Files.readAllLines(FICHERO_USUARIOS);
@@ -42,6 +67,12 @@ public class UsuarioService {
         return false;
     }
 
+    /**
+     * Método que registra un usuario
+     * 
+     * @param u Usuario a registrar
+     * @return true si el usuario se registró correctamente, false en caso contrario
+     */
     public boolean registrarUsuario(Usuario u) {
         if (existeUsuario(u.getEmail()))
             return false;
@@ -59,6 +90,14 @@ public class UsuarioService {
         }
     }
 
+    /**
+     * Método que inicia sesión
+     * 
+     * @param email    Email del usuario
+     * @param password Contraseña del usuario
+     * @return true si el usuario inició sesión correctamente, false en caso
+     *         contrario
+     */
     public boolean iniciarSesion(String email, String password) {
         try {
             List<String> lineas = Files.readAllLines(FICHERO_USUARIOS);
