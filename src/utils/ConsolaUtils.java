@@ -22,7 +22,7 @@ public class ConsolaUtils {
             System.out.print(mensaje);
             texto = sc.nextLine().trim();
             if (texto.isEmpty()) {
-                System.out.println("El campo no puede estar vacío.");
+                System.out.println("  [!] El campo no puede estar vacío. Inténtalo de nuevo.");
             }
         }
         return texto;
@@ -35,9 +35,12 @@ public class ConsolaUtils {
      * @return Texto leído de la consola
      */
     public static String leerTextoMultilinea(String mensaje) {
-        System.out.println(mensaje + " (Escribe 'FIN' en una nueva línea para terminar):");
+        System.out.println(mensaje);
+        System.out.println("  (Nota: Escribe 'FIN' en una nueva línea para terminar y guardar)");
+        System.out.println("  -------------------------------------------");
         StringBuilder sb = new StringBuilder();
         while (true) {
+            System.out.print("  | "); // Guía visual para el bloque de texto
             String linea = sc.nextLine();
             if (linea.trim().equalsIgnoreCase("FIN")) {
                 break;

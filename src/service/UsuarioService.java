@@ -34,7 +34,7 @@ public class UsuarioService {
                 Files.createFile(FICHERO_USUARIOS);
             }
         } catch (IOException e) {
-            System.out.println("Error inicializando sistema: " + e.getMessage());
+            System.out.println("[ERROR] Error inicializando sistema: " + e.getMessage());
         }
     }
 
@@ -70,7 +70,7 @@ public class UsuarioService {
             }
             return hexString.toString();
         } catch (NoSuchAlgorithmException e) {
-            System.out.println("Error crítico de seguridad: Algoritmo no encontrado.");
+            System.out.println("[ERROR] Error crítico de seguridad: Algoritmo no encontrado.");
             return null;
         }
     }
@@ -90,7 +90,7 @@ public class UsuarioService {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error leyendo usuarios.");
+            System.out.println("[ERROR] Error leyendo usuarios.");
         }
         return false;
     }
@@ -117,7 +117,7 @@ public class UsuarioService {
             Files.createDirectories(carpetaPersonal);
             return true;
         } catch (IOException e) {
-            System.out.println("Error al registrar: " + e.getMessage());
+            System.out.println("[ERROR] Error al registrar: " + e.getMessage());
             return false;
         }
     }
@@ -142,7 +142,7 @@ public class UsuarioService {
                 }
             }
         } catch (IOException e) {
-            System.out.println("Error en el inicio de sesión.");
+            System.out.println("[ERROR] Error en el inicio de sesión.");
         }
         return false;
     }

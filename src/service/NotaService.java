@@ -53,7 +53,7 @@ public class NotaService {
 
             archivos.sort((p1, p2) -> p1.getFileName().compareTo(p2.getFileName()));
         } catch (IOException e) {
-            System.out.println("Error explorando la carpeta de notas.");
+            System.out.println("[ERROR] Explorando la carpeta de notas.");
         }
         return archivos;
     }
@@ -78,9 +78,9 @@ public class NotaService {
             bw.write(nota.getTitulo());
             bw.newLine();
             bw.write(nota.getContenido());
-            System.out.println("Nota guardada correctamente en " + rutaNuevaNota.getFileName());
+            System.out.println("[EXITO] Nota guardada correctamente en el archivo: " + rutaNuevaNota.getFileName());
         } catch (IOException e) {
-            System.out.println("Error al guardar la nota.");
+            System.out.println("[ERROR] Error al guardar la nota.");
         }
     }
 
@@ -107,7 +107,7 @@ public class NotaService {
                     listaNotas.add(new Nota(titulo, contenido.toString().trim()));
                 }
             } catch (IOException e) {
-                System.out.println("Error al leer la nota " + archivo.getFileName());
+                System.out.println("[ERROR] Error al leer la nota " + archivo.getFileName());
             }
         }
         return listaNotas;
@@ -133,7 +133,7 @@ public class NotaService {
             Files.delete(archivoABorrar);
             return true;
         } catch (IOException e) {
-            System.out.println("Error al borrar el fichero: " + e.getMessage());
+            System.out.println("[ERROR] Error al borrar el fichero: " + e.getMessage());
             return false;
         }
     }
