@@ -35,13 +35,4 @@ public class Nota {
     public String getContenido() {
         return contenido;
     }
-
-    /**
-     * Método que devuelve la nota en formato string
-     * 
-     * @return Nota en formato string
-     */
-    public String toFicheroString() {
-        return titulo + ";" + contenido;
-    }
 }

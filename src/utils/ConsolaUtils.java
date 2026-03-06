@@ -29,6 +29,25 @@ public class ConsolaUtils {
     }
 
     /**
+     * Método que lee un texto multilinea de la consola
+     * 
+     * @param mensaje Mensaje a mostrar en la consola
+     * @return Texto leído de la consola
+     */
+    public static String leerTextoMultilinea(String mensaje) {
+        System.out.println(mensaje + " (Escribe 'FIN' en una nueva línea para terminar):");
+        StringBuilder sb = new StringBuilder();
+        while (true) {
+            String linea = sc.nextLine();
+            if (linea.trim().equalsIgnoreCase("FIN")) {
+                break;
+            }
+            sb.append(linea).append(System.lineSeparator());
+        }
+        return sb.toString().trim();
+    }
+
+    /**
      * Método que lee un entero de la consola
      * 
      * @param mensaje Mensaje a mostrar en la consola

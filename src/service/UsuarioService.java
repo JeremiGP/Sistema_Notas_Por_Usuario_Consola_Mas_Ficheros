@@ -11,7 +11,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 // Importamos las clases de java.util para poder trabajar con listas
 import java.util.List;
 
@@ -48,6 +49,33 @@ public class UsuarioService {
     }
 
     /**
+     * Método que hashea una contraseña
+     * 
+     * @param password Contraseña a hashear
+     * @return Contraseña hasheada
+     */
+    private String hashSHA256(String password) {
+        try {
+            // Instanciamos el algoritmo SHA-256
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(password.getBytes());
+
+            // Convertimos los bytes en texto hexadecimal
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : hash) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1)
+                    hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            System.out.println("Error crítico de seguridad: Algoritmo no encontrado.");
+            return null;
+        }
+    }
+
+    /**
      * Método que comprueba si existe un usuario
      * 
      * @param email Email del usuario
@@ -77,8 +105,12 @@ public class UsuarioService {
         if (existeUsuario(u.getEmail()))
             return false;
 
+        String passHash = hashSHA256(u.getPassword());
+        if (passHash == null)
+            return false;
+
         try (BufferedWriter bw = Files.newBufferedWriter(FICHERO_USUARIOS, StandardOpenOption.APPEND)) {
-            bw.write(u.getEmail() + ";" + u.getPassword());
+            bw.write(u.getEmail() + ";" + passHash);
             bw.newLine();
 
             Path carpetaPersonal = CARPETA_USUARIOS.resolve(sanitizarEmail(u.getEmail()));
@@ -99,11 +131,13 @@ public class UsuarioService {
      *         contrario
      */
     public boolean iniciarSesion(String email, String password) {
+        String passHashInput = hashSHA256(password);
+
         try {
             List<String> lineas = Files.readAllLines(FICHERO_USUARIOS);
             for (String linea : lineas) {
                 String[] partes = linea.split(";");
-                if (partes.length == 2 && partes[0].equals(email) && partes[1].equals(password)) {
+                if (partes.length == 2 && partes[0].equals(email) && partes[1].equals(passHashInput)) {
                     return true;
                 }
             }

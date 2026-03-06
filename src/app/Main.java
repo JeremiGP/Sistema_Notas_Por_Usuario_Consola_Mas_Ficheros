@@ -137,9 +137,9 @@ public class Main {
      * @param email Email del usuario logueado
      */
     private static void crearNotaMenu(String email) {
-        System.out.println("\n--- NUEVA NOTA ---");
+        System.out.println("\n--- ✍️ NUEVA NOTA ---");
         String titulo = ConsolaUtils.leerTexto("Título: ");
-        String contenido = ConsolaUtils.leerTexto("Contenido: ");
+        String contenido = ConsolaUtils.leerTextoMultilinea("Contenido");
 
         Nota nueva = new Nota(titulo, contenido);
         ns.guardarNota(email, nueva);

@@ -8,6 +8,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 // Importamos las clases de java.nio.file para poder trabajar con ficheros
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -32,14 +33,29 @@ public class NotaService {
     }
 
     /**
-     * Método que devuelve el fichero de notas del usuario
+     * Método que devuelve todas las rutas de los archivos nota_XXX.txt ordenados
+     * alfabéticamente
      * 
      * @param email Email del usuario
-     * @return Fichero de notas del usuario
+     * @return Lista de rutas de los archivos nota_XXX.txt ordenados alfabéticamente
      */
-    private Path obtenerFicheroNotas(String email) {
-        String emailSanitizado = usuarioService.sanitizarEmail(email);
-        return UsuarioService.CARPETA_USUARIOS.resolve(emailSanitizado).resolve("notas.txt");
+    private List<Path> obtenerArchivosNotas(String email) {
+        List<Path> archivos = new ArrayList<>();
+        Path dirUsuario = UsuarioService.CARPETA_USUARIOS.resolve(usuarioService.sanitizarEmail(email));
+
+        if (!Files.exists(dirUsuario))
+            return archivos;
+
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(dirUsuario, "nota_*.txt")) {
+            for (Path entry : stream) {
+                archivos.add(entry);
+            }
+
+            archivos.sort((p1, p2) -> p1.getFileName().compareTo(p2.getFileName()));
+        } catch (IOException e) {
+            System.out.println("Error explorando la carpeta de notas.");
+        }
+        return archivos;
     }
 
     /**
@@ -49,69 +65,75 @@ public class NotaService {
      * @param nota  Nota a guardar
      */
     public void guardarNota(String email, Nota nota) {
-        Path ficheroNotas = obtenerFicheroNotas(email);
-        try (BufferedWriter bw = Files.newBufferedWriter(ficheroNotas, StandardOpenOption.CREATE,
-                StandardOpenOption.APPEND)) {
-            bw.write(nota.toFicheroString());
+        Path dirUsuario = UsuarioService.CARPETA_USUARIOS.resolve(usuarioService.sanitizarEmail(email));
+
+        int id = 1;
+        Path rutaNuevaNota;
+        do {
+            rutaNuevaNota = dirUsuario.resolve(String.format("nota_%03d.txt", id));
+            id++;
+        } while (Files.exists(rutaNuevaNota));
+
+        try (BufferedWriter bw = Files.newBufferedWriter(rutaNuevaNota, StandardOpenOption.CREATE)) {
+            bw.write(nota.getTitulo());
             bw.newLine();
-            System.out.println("Nota guardada correctamente.");
+            bw.write(nota.getContenido());
+            System.out.println("Nota guardada correctamente en " + rutaNuevaNota.getFileName());
         } catch (IOException e) {
             System.out.println("Error al guardar la nota.");
         }
     }
 
     /**
-     * Método que obtiene las notas del usuario
+     * Metodo para obtener la nota.
      * 
-     * @param email Email del usuario
-     * @return Lista de notas del usuario
+     * @param email Obtiene el Email del usuario.
+     * @return Devulves las notas adjudicadas a ese email.
      */
     public List<Nota> obtenerNotas(String email) {
         List<Nota> listaNotas = new ArrayList<>();
-        Path ficheroNotas = obtenerFicheroNotas(email);
+        List<Path> archivos = obtenerArchivosNotas(email);
 
-        if (!Files.exists(ficheroNotas))
-            return listaNotas;
+        for (Path archivo : archivos) {
+            try {
+                List<String> lineas = Files.readAllLines(archivo);
+                if (!lineas.isEmpty()) {
+                    String titulo = lineas.get(0);
 
-        try {
-            List<String> lineas = Files.readAllLines(ficheroNotas);
-            for (String linea : lineas) {
-                String[] partes = linea.split(";");
-                String titulo = partes[0];
-                String contenido = partes.length > 1 ? partes[1] : "";
-                listaNotas.add(new Nota(titulo, contenido));
+                    StringBuilder contenido = new StringBuilder();
+                    for (int i = 1; i < lineas.size(); i++) {
+                        contenido.append(lineas.get(i)).append("\n");
+                    }
+                    listaNotas.add(new Nota(titulo, contenido.toString().trim()));
+                }
+            } catch (IOException e) {
+                System.out.println("Error al leer la nota " + archivo.getFileName());
             }
-        } catch (IOException e) {
-            System.out.println("Error al leer las notas.");
         }
         return listaNotas;
     }
 
     /**
-     * Método que elimina una nota
+     * Metodo para eliminar notas
      * 
-     * @param email      Email del usuario
-     * @param numeroNota Número de la nota a eliminar
-     * @return true si la nota se eliminó correctamente, false en caso contrario
+     * @param email      Obtiene el email del usuario.
+     * @param numeroNota Obtiene el numero de la nota.
+     * @return Devulve la nota eliminada.
      */
     public boolean eliminarNota(String email, int numeroNota) {
-        Path ficheroNotas = obtenerFicheroNotas(email);
-        List<Nota> notasActuales = obtenerNotas(email);
+        List<Path> archivos = obtenerArchivosNotas(email);
 
-        if (numeroNota < 1 || numeroNota > notasActuales.size()) {
+        if (numeroNota < 1 || numeroNota > archivos.size()) {
             return false;
         }
 
-        notasActuales.remove(numeroNota - 1);
+        Path archivoABorrar = archivos.get(numeroNota - 1);
 
-        try (BufferedWriter bw = Files.newBufferedWriter(ficheroNotas)) {
-            for (Nota n : notasActuales) {
-                bw.write(n.toFicheroString());
-                bw.newLine();
-            }
+        try {
+            Files.delete(archivoABorrar);
             return true;
         } catch (IOException e) {
-            System.out.println("Error al actualizar el fichero tras eliminar.");
+            System.out.println("Error al borrar el fichero: " + e.getMessage());
             return false;
         }
     }
